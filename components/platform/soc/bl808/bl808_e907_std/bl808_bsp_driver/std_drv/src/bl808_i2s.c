@@ -478,7 +478,7 @@ void I2S_Tx_FIFO_Flush(I2S_ID_Type i2sId)
 
     tmpVal = BL_SET_REG_BIT(tmpVal, I2S_TX_FIFO_CLR);
 
-    BL_WR_REG(I2Sx, I2S_CONFIG, tmpVal);
+    BL_WR_REG(I2Sx, I2S_FIFO_CONFIG_0, tmpVal);
 }
 
 /****************************************************************************/ /**
