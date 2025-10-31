@@ -1001,12 +1001,39 @@ static void ota_cmd(char *buf, int len, int argc, char **argv)
     aos_task_new("LOCAL OTA", tftp_ota_thread, 0, 4096);
 }
 
+#if (configGENERATE_RUN_TIME_STATS != 0)
+static const char *task_state_to_string(eTaskState state)
+{
+    switch (state) {
+        case eRunning:
+            return "RUN";
+        case eReady:
+            return "READY";
+        case eBlocked:
+            return "BLOCK";
+        case eSuspended:
+            return "SUSP";
+        case eDeleted:
+            return "DEL";
+        case eInvalid:
+        default:
+            return "INVAL";
+    }
+}
+#endif
+
 static void ps_cmd(char *buf, int len, int argc, char **argv)
 {
+    (void)buf;
+    (void)len;
+    (void)argc;
+    (void)argv;
+
+#if (configGENERATE_RUN_TIME_STATS == 0)
     char *pcWriteBuffer, *info;
     const char *const pcHeader = "State   Priority  Stack    #          Base\r\n********************************************************\r\n";
     BaseType_t xSpacePadding;
- 
+
     info = pvPortMalloc(1536);
     if (NULL == info) {
         return;
@@ -1014,25 +1041,94 @@ static void ps_cmd(char *buf, int len, int argc, char **argv)
     pcWriteBuffer = info;
 
     /* Generate a table of task stats. */
-    strcpy(pcWriteBuffer, "Task" );
-    pcWriteBuffer += strlen(pcWriteBuffer );
- 
+    strcpy(pcWriteBuffer, "Task");
+    pcWriteBuffer += strlen(pcWriteBuffer);
+
     /* Minus three for the null terminator and half the number of characters in
     "Task" so the column lines up with the centre of the heading. */
-    for ( xSpacePadding = strlen( "Task" ); xSpacePadding < ( configMAX_TASK_NAME_LEN - 3 ); xSpacePadding++ ) {                                 
+    for (xSpacePadding = strlen("Task"); xSpacePadding < (configMAX_TASK_NAME_LEN - 3); xSpacePadding++) {
         /* Add a space to align columns after the task's name. */
-        *pcWriteBuffer = ' ';         
-        pcWriteBuffer++;              
-    
+        *pcWriteBuffer = ' ';
+        pcWriteBuffer++;
+
         /* Ensure always terminated. */
-        *pcWriteBuffer = 0x00;        
-    }                                 
-    strcpy(pcWriteBuffer, pcHeader );
+        *pcWriteBuffer = 0x00;
+    }
+    strcpy(pcWriteBuffer, pcHeader);
     vTaskList(pcWriteBuffer + strlen(pcHeader));
     cli_putstr(info);
 
     vPortFree(info);
+#else
+    TaskStatus_t *pxTaskStatusArray;
+    UBaseType_t uxArraySize, x;
+    configRUN_TIME_COUNTER_TYPE ulTotalTime;
+    double totalTime;
+
+    uxArraySize = uxTaskGetNumberOfTasks();
+    if (uxArraySize == 0) {
+        aos_cli_printf("No tasks running.\r\n");
+        return;
+    }
+
+    pxTaskStatusArray = pvPortMalloc(uxArraySize * sizeof(TaskStatus_t));
+    if (pxTaskStatusArray == NULL) {
+        aos_cli_printf("Failed to allocate task stats buffer.\r\n");
+        return;
+    }
+
+    uxArraySize = uxTaskGetSystemState(pxTaskStatusArray, uxArraySize, &ulTotalTime);
+    if (uxArraySize == 0) {
+        vPortFree(pxTaskStatusArray);
+        aos_cli_printf("Unable to read task stats.\r\n");
+        return;
+    }
+
+    totalTime = (double)ulTotalTime;
+    if (totalTime <= 0.0) {
+        totalTime = 1.0;
+    }
+
+    aos_cli_printf("%-*s %4s %6s %7s %10s %14s %8s\r\n",
+                   configMAX_TASK_NAME_LEN,
+                   "Task",
+                   "#",
+                   "State",
+                   "Priority",
+                   "Stack",
+                   "Abs Time",
+                   "% Time");
+    aos_cli_printf("--------------------------------------------------------------------------------\r\n");
+
+    for (x = 0; x < uxArraySize; x++) {
+        const char *state_str = task_state_to_string(pxTaskStatusArray[x].eCurrentState);
+        unsigned long task_number = (unsigned long)pxTaskStatusArray[x].xTaskNumber;
+        unsigned long current_priority = (unsigned long)pxTaskStatusArray[x].uxCurrentPriority;
+        unsigned long base_priority = (unsigned long)pxTaskStatusArray[x].uxBasePriority;
+        unsigned long stack_high_water = (unsigned long)pxTaskStatusArray[x].usStackHighWaterMark;
+        unsigned long long runtime = (unsigned long long)pxTaskStatusArray[x].ulRunTimeCounter;
+        double percent = ((double)runtime * 100.0) / totalTime;
+
+        if (percent > 100.0) {
+            percent = 100.0;
+        }
+
+        aos_cli_printf("%-*s %4lu %6s %3lu/%-3lu %10lu %14llu %7.2f%%\r\n",
+                       configMAX_TASK_NAME_LEN,
+                       pxTaskStatusArray[x].pcTaskName,
+                       task_number,
+                       state_str,
+                       current_priority,
+                       base_priority,
+                       stack_high_water,
+                       runtime,
+                       percent);
+    }
+
+    vPortFree(pxTaskStatusArray);
+#endif
 }
+
 
 static int cb_idnoe(void *arg, inode_t *node)
 {
@@ -1439,4 +1535,3 @@ int aos_cli_device_fd_get(void)
 {
     return fd_console;
 }
-

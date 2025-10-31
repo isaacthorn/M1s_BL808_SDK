@@ -129,6 +129,7 @@ static inline void resetCycleCounter() {
   asm volatile ("csrw mcycle, x0");
 }
 
+#define configRUN_TIME_COUNTER_TYPE uint64_t
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() resetCycleCounter()
 #define portGET_RUN_TIME_COUNTER_VALUE() getCycleCounter()
 #define configCPU_CORE_CLOCK_HZ (320 * 1000 * 1000)
