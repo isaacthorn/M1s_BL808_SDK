@@ -241,6 +241,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* ---------- Statistics options ---------- */
 #define LWIP_STATS 1
+#define LWIP_STATS_DISPLAY 1
 #ifdef OPENTHREAD_BORDER_ROUTER
 #define LWIP_ERRNO_STDINCLUDE 1
 #else
