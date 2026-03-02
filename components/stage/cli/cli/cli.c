@@ -1468,6 +1468,12 @@ void aos_cli_input_direct(char *buffer, int count)
     cli_main_input(buffer, count);
 }
 
+int aos_cli_handle_input(char* line)
+{
+    return handle_input(line);
+}
+
+
 #if defined BUILD_BIN || defined BUILD_KERNEL
 int                              aos_cli_printf(const char *msg, ...)
 {

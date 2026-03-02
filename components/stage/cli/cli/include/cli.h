@@ -191,6 +191,19 @@ void *aos_cli_event_cb_read_get();
 void aos_cli_input_direct(char *buffer, int count);
 
 /**
+ * Parse input line and locate arguments (if any), keeping count of the number
+ * of arguments and their locations.  Look up and call the corresponding cli
+ * function if one is found and pass it the argv array.
+ *
+ * @return  0 on success: the input line contained at least a function name and
+ *          that function exists and was called.
+ *          1 on lookup failure: there is no corresponding function for the
+ *          input line.
+ *          2 on invalid syntax: the arguments list couldn't be parsed
+ */
+int aos_cli_handle_input(char* line);
+
+/**
  * CLI callback function for write
  *
  * @return  function of write
