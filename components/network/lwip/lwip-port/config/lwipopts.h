@@ -149,7 +149,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* TCP sender buffer space (bytes). */
 #if defined(CFG_CHIP_BL808)
-#define TCP_SND_BUF             (32*TCP_MSS)
+#define TCP_SND_BUF             (16*TCP_MSS)
 #elif defined(CFG_CHIP_BL606P)
 #define TCP_SND_BUF             (12*TCP_MSS)
 #else
@@ -176,7 +176,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* TCP receive window. */
 #if defined(CFG_CHIP_BL808)
-#define TCP_WND                 (48*TCP_MSS)
+#define TCP_WND                 (32*TCP_MSS)
 #elif defined(CFG_CHIP_BL606P)
 #define TCP_WND                 (30*TCP_MSS)
 #else
