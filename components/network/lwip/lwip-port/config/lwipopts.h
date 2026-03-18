@@ -59,7 +59,7 @@
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
 #if defined(CFG_CHIP_BL808)
-#define MEM_SIZE                (60*1024)
+#define MEM_SIZE                (128*1024)
 #elif defined(CFG_CHIP_BL606P)
 #define MEM_SIZE                (60*1024)
 #elif defined(CFG_SDIOWIFI)
@@ -92,7 +92,7 @@ a lot of data that needs to be copied, this should be set high. */
 /* MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP
    segments. */
 #if defined(CFG_CHIP_BL808)
-#define MEMP_NUM_TCP_SEG        100
+#define MEMP_NUM_TCP_SEG        150
 #elif defined(CFG_CHIP_BL606P)
 #define MEMP_NUM_TCP_SEG        100
 #else
@@ -108,7 +108,7 @@ a lot of data that needs to be copied, this should be set high. */
 /* PBUF_POOL_SIZE: the number of buffers in the pbuf pool. */
 #if !defined PBUF_POOL_SIZE
 #if defined(CFG_CHIP_BL808)
-#define PBUF_POOL_SIZE          200
+#define PBUF_POOL_SIZE          256
 #elif defined(CFG_CHIP_BL606P)
 #define PBUF_POOL_SIZE          200
 #else
@@ -149,7 +149,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* TCP sender buffer space (bytes). */
 #if defined(CFG_CHIP_BL808)
-#define TCP_SND_BUF             (12*TCP_MSS)
+#define TCP_SND_BUF             (32*TCP_MSS)
 #elif defined(CFG_CHIP_BL606P)
 #define TCP_SND_BUF             (12*TCP_MSS)
 #else
@@ -176,7 +176,7 @@ a lot of data that needs to be copied, this should be set high. */
 
 /* TCP receive window. */
 #if defined(CFG_CHIP_BL808)
-#define TCP_WND                 (30*TCP_MSS)
+#define TCP_WND                 (48*TCP_MSS)
 #elif defined(CFG_CHIP_BL606P)
 #define TCP_WND                 (30*TCP_MSS)
 #else
