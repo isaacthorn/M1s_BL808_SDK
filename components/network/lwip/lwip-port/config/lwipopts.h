@@ -13,7 +13,7 @@
 #define LWIP_NETIF_HOSTNAME     1
 #define ETHARP_TRUST_IP_MAC     0
 #define IP_REASSEMBLY           1
-#define IP_FRAG                 1
+#define IP_FRAG                 0
 #define ARP_QUEUEING            1
 #define LWIP_NETIF_API          1
 
