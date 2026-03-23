@@ -103,6 +103,25 @@ to exclude the API function. */
 #define INCLUDE_vTaskList					1
 #define INCLUDE_xTaskGetIdleTaskHandle	        1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void vApplicationTaskSwitchedIn( const char * szTaskName ) __attribute__(( weak ));
+#ifdef __cplusplus
+}
+#endif
+
+#ifndef traceTASK_SWITCHED_IN
+    #define traceTASK_SWITCHED_IN()            \
+        do                                     \
+        {                                      \
+            if( vApplicationTaskSwitchedIn )   \
+            {                                  \
+                vApplicationTaskSwitchedIn( pcTaskGetName( NULL ) ); \
+            }                                  \
+        } while( 0 )
+#endif
+
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */
 #define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); __asm volatile( "ebreak" ); for( ;; ); }
