@@ -111,7 +111,7 @@ header file. */
 to zero. */
 static inline unsigned long long getCycleCounter() {
 #if __riscv_xlen == 32
-  register unsigned int cycle, cycleh, cycleh_tmp;
+  unsigned int cycle, cycleh, cycleh_tmp;
   do {
     asm volatile ("rdcycleh %0" : "=r"(cycleh));
     asm volatile ("rdcycle %0" : "=r"(cycle));
